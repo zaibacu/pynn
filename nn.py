@@ -128,7 +128,7 @@ class HiddenLayer(Layer):
 	def __init__(self, size):
 		self.child = None
 		self.parent = None
-		self.neurons = [ HiddenNeuron() ] * size
+		self.neurons = [ HiddenNeuron() for i in range(0, size)]
 		self.neurons.append(BiasNeuron())
 		self.errors = {}
 
