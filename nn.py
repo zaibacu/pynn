@@ -12,8 +12,9 @@ def linear(x):
 
 """NEURONS"""
 class Neuron(object):
-	def __init__(self):
+	def __init__(self, fn):
 		self.sum = 0
+		self.fn = fn
 
 	def add(self, value):
 		pass
@@ -22,37 +23,38 @@ class Neuron(object):
 		self.sum = 0
 
 	def output(self):
-		raise NotImplementedError("Please Implement this method")
+		return self.fn(self.sum)
 
 
 
 class InputNeuron(Neuron):
+	def __init__(self):
+		super(InputNeuron, self).__init__(linear)
+		
 	def set(self, _input):
 		self.input = _input
-
+		
 	def output(self):
-		return self.input
+		return self.input		
 
 class HiddenNeuron(Neuron):
 	def __init__(self, fn = sigmoid):
-		self.fn = fn 
-		
-	def output(self):
-		return self.fn(self.sum)
+		super(HiddenNeuron, self).__init__(fn)
 
 	def add(self, value):
 		self.sum += value
 
 class OutputNeuron(HiddenNeuron):
 	def __init__(self, fn = sigmoid):
-		self.fn = fn 	
+		super(OutputNeuron, self).__init__(fn)	
 
 	def result(self):
 		return self.output()
 
 class BiasNeuron(InputNeuron):
-	def __init__(self):
-		self.set(1)
+	def __init__(self, val = 1):
+		super(BiasNeuron, self).__init__()
+		self.set(val)
 
 class Weights(object):
 	def __init__(self, parent, child):
@@ -232,7 +234,7 @@ class Network(object):
 
 
 
-	def recognize(self, inputs):
+	def predict(self, inputs):
 		self.inputLayer.forward_prop(inputs)
 		return self.outputLayer.result()
 	
