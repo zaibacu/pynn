@@ -58,8 +58,7 @@ class NNTests(unittest.TestCase):
 				[1, 0]
 			])
 
-		inputLayer.forward_prop([1, 2])
-		results = outputLayer.result()
+		results = inputLayer.forward_prop([1, 2])
 		self.assertEqual(round(results[0], 3), 0.906) 
 		self.assertEqual(round(results[1], 3), 0.061) 
 
@@ -82,8 +81,7 @@ class NNTests(unittest.TestCase):
 				[1, 0]
 			])
 
-		inputLayer.forward_prop([1, 2])
-		results = outputLayer.result()
+		results = inputLayer.forward_prop([1, 2])
 		outputLayer.back_prop(results, [1, 0])
 
 		self.assertEqual(round(outputLayer.errors[outputLayer.neurons[0]], 3), 0.008)

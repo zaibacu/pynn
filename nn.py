@@ -134,7 +134,7 @@ class HiddenLayer(Layer):
 
 	def forward_prop(self):
 		super().forward_prop()
-		self.child.forward_prop()
+		return self.child.forward_prop()
 
 	def back_prop(self):
 		for n1 in self.neurons:
@@ -162,7 +162,7 @@ class InputLayer(Layer):
 			self.neurons[i].set(inputs[i])
 
 		super().forward_prop()
-		self.child.forward_prop()
+		return self.child.forward_prop()
 
 	def _set_parent(self, layer):
 		raise NotImplementedError("You cannot use this method")
@@ -184,9 +184,6 @@ class OutputLayer(Layer):
 		raise NotImplementedError("You cannot use this method")
 
 	def forward_prop(self):
-		pass
-
-	def result(self):
 		return [ neuron.result() for neuron in self.neurons ]
 
 	def back_prop(self, output, expected):
@@ -221,8 +218,7 @@ class Network(object):
 		self.outputLayer = newLayer
 
 	def train(self, inputs, expected):
-		self.inputLayer.forward_prop(inputs)
-		result = self.outputLayer.result()
+		result = self.inputLayer.forward_prop(inputs)
 		error = self.calc_error(result, expected)
 		self.outputLayer.back_prop(result, expected)
 		self.outputLayer.weight_update()

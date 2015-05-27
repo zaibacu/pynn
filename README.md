@@ -8,9 +8,10 @@ Usage
 
 ```Python
 from nn import Network
-	
-nn = Network(5, 1, [ 10 10 10 ]) -- Creates network with 5 input neurons, 1 output neuron and 3 hidden layers, 10 neurons each
-
+"""
+	Creates network with 5 input neurons, 1 output neuron and 3 hidden layers, 10 neurons each
+"""
+nn = Network(5, 1, [ 10 10 10 ]) 
 ```
 2) Save network
 ```Python
