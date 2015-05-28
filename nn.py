@@ -13,29 +13,12 @@ def linear(x):
 """NEURONS"""
 class Neuron(object):
 	def __init__(self, fn):
-		self.sum = 0
 		self.fn = fn
-
-	def add(self, value):
-		pass
-
-	def clear(self):
-		self.sum = 0
-
-	def output(self):
-		return self.fn(self.sum)
-
-
+		self.output = 0
 
 class InputNeuron(Neuron):
 	def __init__(self):
 		super(InputNeuron, self).__init__(linear)
-		
-	def set(self, _input):
-		self.input = _input
-		
-	def output(self):
-		return self.input		
 
 class HiddenNeuron(Neuron):
 	def __init__(self, fn = sigmoid):
@@ -49,12 +32,12 @@ class OutputNeuron(HiddenNeuron):
 		super(OutputNeuron, self).__init__(fn)	
 
 	def result(self):
-		return self.output()
+		return self.output
 
-class BiasNeuron(InputNeuron):
+class BiasNeuron(Neuron):
 	def __init__(self, val = 1):
-		super(BiasNeuron, self).__init__()
-		self.set(val)
+		super(BiasNeuron, self).__init__(linear)
+		self.output = 1
 
 class Weights(object):
 	def __init__(self, parent, child):
@@ -102,12 +85,20 @@ class Layer(object):
 			n.clear()
 		self.errors = {}
 
-	def forward_prop(self):
-		self.child.clean()
+	def forward_prop(self, inputs):
+		#Initialize outputs
+		for _in, n1 in zip(inputs, self.neurons):
+			n1.output = n1.fn(_in)
+			
+		for n2 in self.child.neurons:
+			if not isinstance(n2, BiasNeuron):
+				yield sum([n1.output * self.weights.get((n1, n2)) for n1 in self.neurons])		
+		"""
 		for n1 in self.neurons:
 			for n2 in self.child.neurons:
 				if not isinstance(n2, BiasNeuron): 
 					n2.add(n1.output() * self.weights.get((n1, n2)))
+		            """
 
 	def back_prop(self, output, expected):
 		pass
@@ -122,7 +113,7 @@ class Layer(object):
 		weights = self.parent.weights
 		for n1 in self.parent.neurons:
 			for n2 in self.neurons:
-				weights.set((n1, n2), weights.get((n1, n2)) + ALPHA * self.errors[n2] * n1.output())
+				weights.set((n1, n2), weights.get((n1, n2)) + ALPHA * self.errors[n2] * n1.output)
 
 class HiddenLayer(Layer):
 	def __init__(self, size):
@@ -132,14 +123,13 @@ class HiddenLayer(Layer):
 		self.neurons.append(BiasNeuron())
 		self.errors = {}
 
-	def forward_prop(self):
-		super().forward_prop()
-		return self.child.forward_prop()
+	def forward_prop(self, inputs):
+		return self.child.forward_prop(super().forward_prop(inputs))
 
 	def back_prop(self):
 		for n1 in self.neurons:
 			_sum = sum([ self.child.errors[n2] * self.weights.get((n1, n2)) for n2 in self.child.neurons])
-			self.errors[n1] = n1.output() * (1 - n1.output()) * _sum
+			self.errors[n1] = n1.output * (1 - n1.output) * _sum
 				
 
 		self.parent.back_prop()
@@ -157,12 +147,7 @@ class InputLayer(Layer):
 		self.neurons.append(BiasNeuron())
 
 	def forward_prop(self, inputs):
-		#Set inputs
-		for i in range(0, len(inputs)):
-			self.neurons[i].set(inputs[i])
-
-		super().forward_prop()
-		return self.child.forward_prop()
+		return self.child.forward_prop(super().forward_prop(inputs))
 
 	def _set_parent(self, layer):
 		raise NotImplementedError("You cannot use this method")
@@ -183,8 +168,8 @@ class OutputLayer(Layer):
 	def _set_child(self, layer):
 		raise NotImplementedError("You cannot use this method")
 
-	def forward_prop(self):
-		return [ neuron.result() for neuron in self.neurons ]
+	def forward_prop(self, inputs):
+		return [ n.fn(_in) for _in, n in zip(inputs, self.neurons) ]
 
 	def back_prop(self, output, expected):
 		for i in range(0, len(self.neurons)):

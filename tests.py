@@ -6,17 +6,6 @@ class NNTests(unittest.TestCase):
 	def setUp(self):
 		pass
 
-	def test_input_neuron(self):
-		neuron = InputNeuron()
-		neuron.set(3.14)
-		self.assertEqual(neuron.output(), 3.14)
-
-	def test_neuron_sigmoid(self):
-		neuron = HiddenNeuron()
-		self.assertEqual(neuron.output(), 0.5)
-		neuron.add(1)
-		self.assertEqual(round(neuron.output(), 3), 0.731)
-
 	def test_create_input_layer(self):
 		inputLayer = InputLayer(2)
 		self.assertEqual(len(inputLayer.neurons), 3) #2 normal and 1 bias
@@ -35,9 +24,8 @@ class NNTests(unittest.TestCase):
 		for key, val in inputLayer.weights.items():
 			inputLayer.weights.set(key, 1)
 
-		inputLayer.forward_prop([1, 1])
-
-		self.assertEqual(round(outputLayer.neurons[0].output(), 3), 0.953)
+		results = inputLayer.forward_prop([1, 1])
+		self.assertEqual(list(map(lambda x: round(x, 3), results)), [ 0.953 ])
 
 	def test_output(self):
 		inputLayer = InputLayer(2)
@@ -59,8 +47,7 @@ class NNTests(unittest.TestCase):
 			])
 
 		results = inputLayer.forward_prop([1, 2])
-		self.assertEqual(round(results[0], 3), 0.906) 
-		self.assertEqual(round(results[1], 3), 0.061) 
+		self.assertEqual(list(map(lambda x: round(x, 3), results)), [ 0.906, 0.061 ])
 
 	def test_backprop(self):
 		inputLayer = InputLayer(2)
