@@ -5,7 +5,11 @@ import pickle
 ALPHA = 1
 
 def sigmoid(x):
-	return 1/(1 + math.pow(math.e, -x))
+	try:
+		return 1/(1 + math.pow(math.e, -x))
+	except OverflowError:
+		print("number {0} is too big".format(x))
+		raise
 
 def linear(x):
 	return x
@@ -180,6 +184,7 @@ class OutputLayer(Layer):
 	def weight_update(self):
 		super().weight_update()
 		self.parent.weight_update()
+		
 
 
 class Network(object):
@@ -216,8 +221,7 @@ class Network(object):
 
 
 	def predict(self, inputs):
-		self.inputLayer.forward_prop(inputs)
-		return self.outputLayer.result()
+		return self.inputLayer.forward_prop(inputs)
 	
 	
 	def save(self, fileName = "network.bin"):
