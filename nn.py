@@ -159,10 +159,10 @@ class InputLayer(Layer):
 		pass
 
 class OutputLayer(Layer):
-	def __init__(self, size):
+	def __init__(self, size, fn = sigmoid):
 		self.child = None
 		self.parent = None
-		self.neurons = [ OutputNeuron() for i in range(0, size)]
+		self.neurons = [ OutputNeuron(fn = fn) for i in range(0, size)]
 		self.errors = {}
 
 	def _set_child(self, layer):
@@ -183,7 +183,7 @@ class OutputLayer(Layer):
 
 
 class Network(object):
-	def __init__(self, _in, _out, hidden):
+	def __init__(self, _in, _out, hidden, outputFn = sigmoid):
 		self.layers = []
 		#create layers
 		parentLayer = InputLayer(_in)
@@ -196,7 +196,7 @@ class Network(object):
 			self.layers.append(newLayer)
 			parentLayer = newLayer
 
-		newLayer = OutputLayer(_out)
+		newLayer = OutputLayer(_out, outputFn)
 		parentLayer.connect(newLayer)
 		parentLayer.weights.randomize()
 		self.layers.append(newLayer)
