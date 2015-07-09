@@ -226,7 +226,7 @@ class Network(object):
 	
 	def save(self, fileName = "network.bin"):
 		with open(fileName, "wb") as f:
-			pickle.dump(network, f, pickle.HIGHEST_PROTOCOL)
+			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 			
 	@classmethod		
 	def load(cls, fileName = "network.bin"):
